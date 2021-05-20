@@ -1,0 +1,17 @@
+Instruções para uso do código:
+
+(Obs.: os códigos fornecidos foram alterados de forma que atencesse aos requisitos do projeto)
+
+1. O código em C foi compilado e testado pelo GNU Compiler Collection (GCC) numa
+distribuição Linux.
+
+2. Dentro do Linux, rode o script build.sh.
+
+3. Dentro da pasta \bin será gerado um arquivo executável chamado state_machine_fw.
+
+4. Após a compilação pode-se rodar o executável.
+
+5. Os comentários dentro dos códigos-fonte descrevem o funcionamento do programa.
+
+6. O aluno que quiser rodar o código no Windows ou Mac deverá fazer as adaptações
+necessárias quanto à compilação e outros aspectos.
