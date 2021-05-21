@@ -35,11 +35,9 @@ static int st_count_4(STATE_FUNCTIONS_ARGS);
 
 static int st_count_5(STATE_FUNCTIONS_ARGS);
 
-static int st_count_stop(STATE_FUNCTIONS_ARGS);
-
 static int st_motor_on_horario(STATE_FUNCTIONS_ARGS);
 
-static int st_motor_on_antiorario(STATE_FUNCTIONS_ARGS);
+static int st_motor_on_antihorario(STATE_FUNCTIONS_ARGS);
 
 static int st_motor_off(STATE_FUNCTIONS_ARGS);
 
@@ -73,9 +71,8 @@ const static state_handler state_handler_container[NUMBER_ST] =
    [ST_COUNT_3] = {ST_COUNT_3, st_count_3},
    [ST_COUNT_4] = {ST_COUNT_4, st_count_4},
    [ST_COUNT_5] = {ST_COUNT_5, st_count_5},
-   [ST_COUNT_STOP] = {ST_COUNT_STOP, st_count_stop},
    [ST_MOTOR_ON_HORARIO] = {ST_MOTOR_ON_HORARIO, st_motor_on_horario},
-   [ST_MOTOR_ON_ANTIHORARIO] = {ST_MOTOR_ON_ANTIHORARIO, st_motor_on_antiorario},
+   [ST_MOTOR_ON_ANTIHORARIO] = {ST_MOTOR_ON_ANTIHORARIO, st_motor_on_antihorario},
    [ST_MOTOR_OFF] = {ST_MOTOR_OFF, st_motor_off},
    [ST_EMERG_ON] = {ST_EMERG_ON, st_emerg_on}
 };
@@ -194,13 +191,6 @@ static int st_count_5(STATE_FUNCTIONS_ARGS)
    return 0;
 }
 
-
-static int st_count_stop(STATE_FUNCTIONS_ARGS)
-{
-   PDEBUGY("st_count_stop execution\n");
-   return 0;
-}
-
 static int st_motor_on_horario(STATE_FUNCTIONS_ARGS)
 {
    PDEBUGY("st_motor_on_horario execution\n");
@@ -300,21 +290,47 @@ int sm_run(void)
    // ----> Change this transition function accordingly to your automaton model!
    const static state_id f[NUMBER_ST][NUMBER_EV] =
    {
-      [ST_LED_OFF]       = {ST_NULL, ST_LED_OFF, ST_LED_ON, ST_LED_PWM_SETUP, ST_NULL, ST_NULL, ST_EMERG_ON, ST_LED_OFF, ST_LED_ON, ST_NULL, ST_NULL, ST_NULL},
-      [ST_LED_ON]        = {ST_NULL, ST_LED_OFF, ST_LED_ON, ST_LED_PWM_SETUP, ST_NULL, ST_NULL, ST_EMERG_ON, ST_LED_OFF, ST_LED_ON, ST_NULL, ST_NULL, ST_NULL},
-      [ST_LED_PWM_SETUP] = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_LED_PWM_RUN, ST_EMERG_ON, ST_LED_OFF, ST_NULL, ST_NULL, ST_NULL, ST_NULL},
-      [ST_LED_PWM_RUN]   = {ST_NULL, ST_LED_OFF, ST_NULL, ST_LED_PWM_RUN, ST_LED_PWM_RUN, ST_NULL, ST_EMERG_ON, ST_LED_OFF, ST_LED_PWM_RUN, ST_NULL, ST_NULL, ST_NULL},
-      [ST_EMERG_ON]      = {ST_NULL, ST_EMERG_ON, ST_EMERG_ON, ST_EMERG_ON, ST_EMERG_ON, ST_EMERG_ON, ST_EMERG_ON, ST_LED_OFF, ST_EMERG_ON, ST_EMERG_ON, ST_EMERG_ON, ST_EMERG_ON},
-      [ST_COUNT_0]       = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_COUNT_STOP, ST_COUNT_0, ST_COUNT_0, ST_COUNT_1, ST_NULL, ST_NULL},
-      [ST_COUNT_1]       = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_COUNT_STOP, ST_COUNT_1, ST_COUNT_1, ST_COUNT_2, ST_NULL, ST_NULL},
-      [ST_COUNT_2]       = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_COUNT_STOP, ST_COUNT_2, ST_COUNT_2, ST_COUNT_3, ST_NULL, ST_NULL},
-      [ST_COUNT_3]       = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_COUNT_STOP, ST_COUNT_3, ST_COUNT_3, ST_COUNT_4, ST_NULL, ST_NULL},
-      [ST_COUNT_4]       = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_COUNT_STOP, ST_COUNT_4, ST_COUNT_4, ST_COUNT_5, ST_NULL, ST_NULL},
-      [ST_COUNT_5]       = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_COUNT_STOP, ST_COUNT_5, ST_COUNT_0, ST_COUNT_5, ST_NULL, ST_NULL},
-      [ST_COUNT_STOP]    = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_COUNT_STOP, ST_COUNT_STOP, ST_COUNT_0, ST_NULL, ST_NULL, ST_NULL},
-      [ST_MOTOR_ON_HORARIO]    = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_MOTOR_OFF, ST_MOTOR_OFF, ST_MOTOR_ON_HORARIO, ST_NULL, ST_MOTOR_ON_HORARIO, ST_MOTOR_ON_ANTIHORARIO},
-      [ST_MOTOR_ON_ANTIHORARIO]    = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_MOTOR_OFF, ST_MOTOR_OFF, ST_MOTOR_ON_ANTIHORARIO, ST_NULL, ST_MOTOR_ON_HORARIO, ST_MOTOR_ON_ANTIHORARIO},
-      [ST_MOTOR_OFF]     = {ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_NULL, ST_MOTOR_OFF, ST_MOTOR_OFF,  ST_MOTOR_ON_HORARIO, ST_NULL, ST_MOTOR_OFF, ST_MOTOR_OFF}
+      [ST_LED_OFF]               = {ST_NULL,       ST_LED_OFF,    ST_LED_ON,               ST_LED_PWM_SETUP, ST_NULL,             ST_NULL,
+                                    ST_EMERG_ON,   ST_LED_OFF,    ST_LED_ON,               ST_NULL,          ST_NULL,             ST_NULL},
+
+      [ST_LED_ON]                = {ST_NULL,       ST_LED_OFF,    ST_LED_ON,               ST_LED_PWM_SETUP, ST_NULL,             ST_NULL,
+                                    ST_EMERG_ON,   ST_LED_OFF,    ST_LED_ON,               ST_NULL,          ST_NULL,             ST_NULL},
+
+      [ST_LED_PWM_SETUP]         = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_LED_PWM_RUN,
+                                    ST_EMERG_ON,   ST_LED_OFF,    ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL},
+
+      [ST_LED_PWM_RUN]           = {ST_NULL,       ST_LED_OFF,    ST_NULL,                 ST_LED_PWM_RUN,   ST_LED_PWM_RUN,      ST_NULL,
+                                    ST_EMERG_ON,   ST_LED_OFF,    ST_LED_PWM_RUN,          ST_NULL,          ST_NULL,             ST_NULL},
+
+      [ST_EMERG_ON]              = {ST_NULL,       ST_EMERG_ON,   ST_EMERG_ON,             ST_EMERG_ON,      ST_EMERG_ON,         ST_EMERG_ON,
+                                    ST_EMERG_ON,   ST_LED_OFF,    ST_EMERG_ON,             ST_EMERG_ON,      ST_EMERG_ON,         ST_EMERG_ON},
+
+      [ST_COUNT_0]               = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_COUNT_0,    ST_COUNT_0,    ST_COUNT_0,              ST_COUNT_1,       ST_NULL,             ST_NULL},
+
+      [ST_COUNT_1]               = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_COUNT_1,    ST_COUNT_1,    ST_COUNT_1,              ST_COUNT_2,       ST_NULL,             ST_NULL},
+
+      [ST_COUNT_2]               = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_COUNT_2,    ST_COUNT_2,    ST_COUNT_2,              ST_COUNT_3,       ST_NULL,             ST_NULL},
+
+      [ST_COUNT_3]               = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_COUNT_3,    ST_COUNT_3,    ST_COUNT_3,              ST_COUNT_4,       ST_NULL,             ST_NULL},
+
+      [ST_COUNT_4]               = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_COUNT_4,    ST_COUNT_4,    ST_COUNT_4,              ST_COUNT_5,       ST_NULL,             ST_NULL},
+
+      [ST_COUNT_5]               = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_COUNT_5,    ST_COUNT_5,    ST_COUNT_0,              ST_COUNT_5,       ST_NULL,             ST_NULL},
+
+      [ST_MOTOR_ON_HORARIO]      = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_MOTOR_OFF,  ST_MOTOR_OFF,  ST_MOTOR_ON_HORARIO,     ST_NULL,          ST_MOTOR_ON_HORARIO, ST_MOTOR_ON_ANTIHORARIO},
+
+      [ST_MOTOR_ON_ANTIHORARIO]  = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_MOTOR_OFF,  ST_MOTOR_OFF,  ST_MOTOR_ON_ANTIHORARIO, ST_NULL,          ST_MOTOR_ON_HORARIO, ST_MOTOR_ON_ANTIHORARIO},
+
+      [ST_MOTOR_OFF]             = {ST_NULL,       ST_NULL,       ST_NULL,                 ST_NULL,          ST_NULL,             ST_NULL,
+                                    ST_MOTOR_OFF,  ST_MOTOR_OFF,  ST_MOTOR_ON_HORARIO,     ST_NULL,          ST_MOTOR_OFF,        ST_MOTOR_OFF}
    };
 
    PDEBUG("sm_run execution\n");
@@ -337,6 +353,7 @@ int sm_run(void)
 
             // Execute next state function, return 0 if everything went OK or -1 otherwise
             ret = state_handler_container[_led_state].state_exe(ex_data, in_data);
+            if(ret == -1) return ret;
          }
          else if(event == EV_NA){
             
@@ -361,6 +378,7 @@ int sm_run(void)
 
                // Execute next state function, return 0 if everything went OK or -1 otherwise
                ret = state_handler_container[_motor_state].state_exe(ex_data, in_data);
+               if(ret == -1) return ret;
             }
             else {
                // If the new event is not recognized in current state, f returns a 'NULL' state, and the function
@@ -369,7 +387,7 @@ int sm_run(void)
             } 
          }
 
-         if(event < EV_MOTOR_R){
+         if(event < EV_MOTOR_HORARIO){
             // Get the next state to be executed
             next_count_state = f[_count_state][event];
 
@@ -379,6 +397,7 @@ int sm_run(void)
 
                // Execute next state function, return 0 if everything went OK or -1 otherwise
                ret = state_handler_container[_count_state].state_exe(ex_data, in_data);
+               if(ret == -1) return ret;
             }
             else {
                // If the new event is not recognized in current state, f returns a 'NULL' state, and the function

@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "state_machine.h"
 
-#define SIMULATION_TIME      12
+#define SIMULATION_TIME      13
 
 
 int main(void)
@@ -20,15 +20,16 @@ int main(void)
    event_id string_from_E_star[SIMULATION_TIME] =
    {
       EV_NA,
-      EV_MOTOR_L,
+      EV_MOTOR_ANTIHORARIO,
       EV_SENSOR_DETECT,
       EV_SENSOR_DETECT,
       EV_SENSOR_DETECT,
+      EV_NF_ON,
+      EV_NF_OFF,
+      EV_NA,
       EV_SENSOR_DETECT,
       EV_SENSOR_DETECT,
       EV_NONE,
-      EV_NF_ON,
-      EV_NF_OFF,
       EV_NA,
       EV_SENSOR_DETECT,
    };
